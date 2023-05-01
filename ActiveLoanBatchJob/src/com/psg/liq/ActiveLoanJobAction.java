@@ -60,29 +60,33 @@ public class ActiveLoanJobAction {
 					if (resCustomTableValue != null && resCustomTableValue.getRow() > 0) {
 						while (resGetActiveLoans.next()) {
 
-							// update record
 							String customOstId = resCustomTableValue.getString(1);
 							double customAmtOstCurrent = resCustomTableValue.getDouble(2);
 
-							LOGGER.info("Updating the record with Outstanding ID :" + customOstId
-									+ " with current amount :" + customAmtOstCurrent);
+							if (customAmtOstCurrent != activeAmtOstCurrent) {
+								
+								// update record
+								LOGGER.info("Updating the record with Outstanding ID :" + customOstId
+										+ " with current amount :" + customAmtOstCurrent);
 
-							PreparedStatement updateCustom = connection
-									.prepareStatement(properties.getProperty("queryUpdateLoanCustomTable"));
-							updateCustom.setDouble(1, customAmtOstCurrent);
-							updateCustom.setString(2, customOstId);
-							int row = updateCustom.executeUpdate();
+								PreparedStatement updateCustom = connection
+										.prepareStatement(properties.getProperty("queryUpdateLoanCustomTable"));
+								updateCustom.setDouble(1, customAmtOstCurrent);
+								updateCustom.setString(2, customOstId);
+								int row = updateCustom.executeUpdate();
 
-							if (row > 0) {
-								numActiveLoansRecordsUpdated++;
-								LOGGER.info("Successfully updated the Current Amount of this Outstanding ID: "
-										+ customOstId);
+								if (row > 0) {
+									numActiveLoansRecordsUpdated++;
+									LOGGER.info("Successfully updated the Current Amount of this Outstanding ID: "
+											+ customOstId);
 
-								updatedRecords.add(customOstId + " " + customAmtOstCurrent);
-							} else {
-								LOGGER.info(
-										"Update executed but no row updated for this Outstanding ID: " + customOstId);
+									updatedRecords.add(customOstId + " " + customAmtOstCurrent);
+								} else {
+									LOGGER.info("Update executed but no row updated for this Outstanding ID: "
+											+ customOstId);
+								}
 							}
+
 						}
 					} else {
 						// insert record
